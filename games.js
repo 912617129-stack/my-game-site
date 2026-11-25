@@ -1,303 +1,47 @@
-
-const categoryData = [
-  {
-    id: "action",
-    name: "アクション",
-    emoji: "⚔️",
-    games: ["ヒーローアドベンチャー","忍者ランナー","モンスターバトル","スカイジャンプ","ダンジョンファイト","スーパーアタック","ドラゴンハンター","シャドウファイター","タワーディフェンス","エピックウォリアー"]
-  },
-  {
-    id: "racing",
-    name: "レース",
-    emoji: "🏎️",
-    games: ["スーパーカーレース","ドリフトチャレンジ","ターボレーサー","オフロードレース","バイクレーシング","スピードスター","シティドライブ","フォーミュラレーサー","モンスタートラック","ハイウェイレーサー"]
-  },
-  {
-    id: "puzzle",
-    name: "パズル",
-    emoji: "🧩",
-    games: ["ブロックマスター","マッチパズル","カラーコネクト","ナンバーパズル","宝石パズル","マジックキューブ","ボールソート","ロジックチャレンジ","タイルパズル","脳トレマスター"]
-  },
-  {
-    id: "shooting",
-    name: "シューティング",
-    emoji: "🚀",
-    games: ["スペースシューター","ゾンビディフェンス","バトルアリーナ","ギャラクシーアタック","スナイパーチャレンジ","エイリアンハンター","タンクバトル","ネオンシューター","ロボットウォーズ","スペースガーディアン"]
-  },
-  {
-    id: "adventure",
-    name: "冒険",
-    emoji: "🗺️",
-    games: ["ジャングルクエスト","失われた島","トレジャーハンター","ミステリーランド","マジックフォレスト","海賊の冒険","スカイアイランド","古代遺跡の謎","サバイバルアイランド","クリスタルクエスト"]
-  },
-  {
-    id: "rpg",
-    name: "RPG",
-    emoji: "🏰",
-    games: ["ファンタジークエスト","ドラゴンレジェンド","勇者の旅","マジックキングダム","ソードマスター","モンスタークロニクル","エレメントヒーローズ","キングダムバトル","レジェンドオブナイト","ミスティックワールド"]
-  },
-  {
-    id: "sports",
-    name: "スポーツ",
-    emoji: "⚽",
-    games: ["ストリートサッカー","バスケットチャレンジ","テニスマスター","ボウリングキング","ゴルフアドベンチャー","バレーボールスター","卓球チャンピオン","スケートボード","ベースボールヒーロー","フットボールスター"]
-  },
-  {
-    id: "horror",
-    name: "ホラー",
-    emoji: "👻",
-    games: ["ダークハウス","ホーンテッドスクール","ナイトサバイバル","ミステリーマンション","シャドウホール","ゴーストハンター","廃病院の謎","ミッドナイト","恐怖の森","ダークエスケープ"]
-  },
-  {
-    id: "simulation",
-    name: "シミュレーション",
-    emoji: "🏗️",
-    games: ["シティビルダー","ファームライフ","レストランマスター","ペットワールド","テーマパーク","マイドリームハウス","アイランドライフ","ショップマネージャー","ファクトリーキング","ホテルストーリー"]
-  },
-  {
-    id: "casual",
-    name: "カジュアル",
-    emoji: "🎲",
-    games: ["スライムジャンプ","フルーツキャッチ","ボールバウンス","カラフルランナー","ペンギンジャンプ","マジックボール","スイートキャンディ","リラックスゲーム","ワンタップチャレンジ","ハッピーパーク"]
-  }
+const categories = [
+  {id:"action",name:"アクション",emoji:"⚔️",names:["ヒーローアドベンチャー","忍者ランナー","モンスターバトル","スカイジャンプ","ダンジョンファイト","スーパーアタック","ドラゴンハンター","シャドウファイター","タワーディフェンス","エピックウォリアー"]},
+  {id:"racing",name:"レース",emoji:"🏎️",names:["スーパーカーレース","ドリフトチャレンジ","ターボレーサー","オフロードレース","バイクレーシング","スピードスター","シティドライブ","フォーミュラレーサー","モンスタートラック","ハイウェイレーサー"]},
+  {id:"puzzle",name:"パズル",emoji:"🧩",names:["数字マージ","メモリーマッチ","カラーコネクト","ナンバーパズル","宝石パズル","マジックキューブ","ボールソート","ロジックチャレンジ","タイルパズル","脳トレマスター"]},
+  {id:"shooting",name:"シューティング",emoji:"🚀",names:["スペースシューター","ゾンビディフェンス","バトルアリーナ","ギャラクシーアタック","スナイパーチャレンジ","エイリアンハンター","タンクバトル","ネオンシューター","ロボットウォーズ","スペースガーディアン"]},
+  {id:"adventure",name:"冒険",emoji:"🗺️",names:["ジャングルクエスト","失われた島","トレジャーハンター","ミステリーランド","マジックフォレスト","海賊の冒険","スカイアイランド","古代遺跡の謎","サバイバルアイランド","クリスタルクエスト"]},
+  {id:"rpg",name:"RPG",emoji:"🏰",names:["ファンタジークエスト","ドラゴンレジェンド","勇者の旅","マジックキングダム","ソードマスター","モンスタークロニクル","エレメントヒーローズ","キングダムバトル","レジェンドオブナイト","ミスティックワールド"]},
+  {id:"sports",name:"スポーツ",emoji:"⚽",names:["ストリートサッカー","バスケットチャレンジ","テニスマスター","ボウリングキング","ゴルフアドベンチャー","バレーボールスター","卓球チャンピオン","スケートボード","ベースボールヒーロー","フットボールスター"]},
+  {id:"horror",name:"ホラー",emoji:"👻",names:["ダークハウス","ホーンテッドスクール","ナイトサバイバル","ミステリーマンション","シャドウホール","ゴーストハンター","廃病院の謎","ミッドナイト","恐怖の森","ダークエスケープ"]},
+  {id:"simulation",name:"シミュレーション",emoji:"🏗️",names:["シティビルダー","ファームライフ","レストランマスター","ペットワールド","テーマパーク","マイドリームハウス","アイランドライフ","ショップマネージャー","ファクトリーキング","ホテルストーリー"]},
+  {id:"casual",name:"カジュアル",emoji:"🎲",names:["スライムジャンプ","フルーツキャッチ","ボールバウンス","カラフルランナー","ペンギンジャンプ","マジックボール","スイートキャンディ","リラックスゲーム","ワンタップチャレンジ","ハッピーパーク"]}
 ];
-
-// 100個のゲームカタログを作成
-// 実際のゲームURLは、掲載許可を確認してから登録します
-const games = categoryData.flatMap((category, categoryIndex) =>
-  category.games.map((name, index) => ({
-    id: category.id + "-" + (index + 1),
-    name,
-    category: category.id,
-    categoryName: category.name,
-    emoji: category.emoji,
-    number: categoryIndex * 10 + index + 1,
-    embedUrl: "",
-    description: category.name + "のゲーム",
-    popular: index < 3 && categoryIndex < 4
-  }))
-);
-
-const categoryColors = {
-  action: "#ffe2dc",
-  racing: "#dceeff",
-  puzzle: "#f0e3ff",
-  shooting: "#dce5ff",
-  adventure: "#ddf3e4",
-  rpg: "#ffe8ce",
-  sports: "#dff4e8",
-  horror: "#e7e0ee",
-  simulation: "#fff0d7",
-  casual: "#ffe1ed"
+const colors={action:"#ffe2dc",racing:"#dceeff",puzzle:"#f0e3ff",shooting:"#dce5ff",adventure:"#ddf3e4",rpg:"#ffe8ce",sports:"#dff4e8",horror:"#e7e0ee",simulation:"#fff0d7",casual:"#ffe1ed"};
+const playable = {
+  "puzzle-1":"merge","puzzle-2":"memory","casual-1":"reaction","sports-1":"rps","casual-2":"guess",
+  "action-1":"clicker","puzzle-3":"ttt","racing-1":"runner","shooting-1":"target","casual-3":"whack"
 };
-
-let selectedCategory = "all";
-let searchWord = "";
-let favorites = [];
-
-try {
-  favorites = JSON.parse(
-    localStorage.getItem("gamepark-favorites") || "[]"
-  );
-} catch {
-  favorites = [];
+const games=categories.flatMap((cat,ci)=>cat.names.map((name,i)=>({id:`${cat.id}-${i+1}`,name,category:cat.id,categoryName:cat.name,emoji:cat.emoji,description:`${cat.name}のゲーム`,popular:i<3&&ci<4,mode:playable[`${cat.id}-${i+1}`]||null})));
+const palette={action:"#ffe2dc",racing:"#dceeff",puzzle:"#f0e3ff",shooting:"#dce5ff",adventure:"#ddf3e4",rpg:"#ffe8ce",sports:"#dff4e8",horror:"#e7e0ee",simulation:"#fff0d7",casual:"#ffe1ed"};
+let selectedCategory="all",searchWord="",favorites=[];
+try{favorites=JSON.parse(localStorage.getItem("gamepark-favorites")||"[]")}catch{favorites=[]}
+const $=id=>document.getElementById(id);
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function card(g){let fav=favorites.includes(g.id);return `<article class="game-card" data-id="${g.id}"><button class="favorite-button ${fav?"active":""}" data-favorite="${g.id}" aria-label="お気に入り">${fav?"♥":"♡"}</button>${g.mode?'<span class="play-pill">PLAY</span>':''}<div class="game-image" style="background:${palette[g.category]}">${g.emoji}</div><div class="game-info"><h3>${esc(g.name)}</h3><p>${esc(g.description)}</p><span class="game-tag">${esc(g.categoryName)}</span></div></article>`}
+function render(){const list=games.filter(g=>(selectedCategory==="all"||g.category===selectedCategory)&&(g.name.toLowerCase().includes(searchWord)||g.categoryName.toLowerCase().includes(searchWord)));$("gameGrid").innerHTML=list.map(card).join("");$("gameCount").textContent=`${list.length} / 100 GAMES`;$("emptyMessage").hidden=list.length!==0;$("popularGames").innerHTML=games.filter(g=>g.popular).slice(0,10).map(card).join("");const fav=games.filter(g=>favorites.includes(g.id));$("favoriteGames").innerHTML=fav.map(card).join("");$("noFavorites").hidden=fav.length>0}
+document.querySelectorAll(".category").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".category").forEach(x=>x.classList.remove("active"));b.classList.add("active");selectedCategory=b.dataset.category;render()}));
+$("searchInput").addEventListener("input",e=>{searchWord=e.target.value.trim().toLowerCase();render()});
+document.addEventListener("click",e=>{const fb=e.target.closest("[data-favorite]");if(fb){const id=fb.dataset.favorite;favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];localStorage.setItem("gamepark-favorites",JSON.stringify(favorites));render();return}const c=e.target.closest(".game-card");if(c){const g=games.find(x=>x.id===c.dataset.id);if(g)openGame(g)}});
+function gameDocument(g){
+const common=`<meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#211b50,#6655e8);color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;padding:18px;text-align:center}.box{width:min(100%,560px);background:#ffffff12;border:1px solid #ffffff30;border-radius:24px;padding:24px;box-shadow:0 20px 60px #100b3540}h1{margin:0 0 8px;font-size:clamp(24px,5vw,34px)}p{color:#e5e2ff}.muted{font-size:13px;color:#d0cbff}button{border:0;border-radius:12px;padding:11px 16px;margin:5px;background:#fff;color:#5545d3;font-weight:800;cursor:pointer}button:active{transform:scale(.97)}.big{font-size:42px;font-weight:900;margin:15px}.grid{display:grid;gap:8px;justify-content:center;margin:18px auto}.tile{width:68px;height:68px;border-radius:12px;background:#ffffff20;display:grid;place-items:center;font-size:24px;font-weight:900}.tiles{grid-template-columns:repeat(4,68px)}.cards{grid-template-columns:repeat(4,65px)}.card{height:65px;background:#fff;color:#5849d5;border-radius:12px;font-size:25px}.row{display:flex;justify-content:center;flex-wrap:wrap;gap:6px}.score{font-size:14px;color:#e4e0ff}input{padding:12px;border-radius:10px;border:0;width:130px;font-size:18px;text-align:center}canvas{max-width:100%;background:#fff;border-radius:14px;touch-action:manipulation}</style>`;
+const shell=(title,body,script)=>`<!doctype html><html lang="ja"><head><meta charset="utf-8">${common}<title>${title}</title></head><body><main class="box">${body}</main><script>${script}<\/script></body></html>`;
+if(g.mode==="merge")return shell("数字マージ",`<h1>🔢 数字マージ</h1><p>同じ数字を合わせて2048を目指そう！</p><div class="score">スコア：<b id="score">0</b></div><div id="board" class="grid tiles"></div><p class="muted">矢印キー・WASD・スワイプで操作</p><button onclick="reset()">やり直す</button>`,`let b=Array(16).fill(0),s=0;function add(){let e=b.map((v,i)=>v?null:i).filter(v=>v!==null);if(e.length)b[e[Math.floor(Math.random()*e.length)]]=Math.random()<.9?2:4}function draw(){board.innerHTML=b.map(v=>'<div class="tile" style="background:'+(v?'#fff;color:#5545d3':'#ffffff20')+'">'+(v||'')+'</div>').join('');score.textContent=s}function move(d){let old=b.join();for(let n=0;n<4;n++){let ids=d==='L'?[n*4,n*4+1,n*4+2,n*4+3]:d==='R'?[n*4+3,n*4+2,n*4+1,n*4]:d==='U'?[n,n+4,n+8,n+12]:[n+12,n+8,n+4,n];let a=ids.map(i=>b[i]).filter(Boolean),out=[];for(let i=0;i<a.length;i++){if(a[i]===a[i+1]){out.push(a[i]*2);s+=a[i]*2;i++}else out.push(a[i])}while(out.length<4)out.push(0);ids.forEach((id,i)=>b[id]=out[i])}if(old!==b.join()){add();draw()}}onkeydown=e=>{let m={ArrowLeft:'L',a:'L',ArrowRight:'R',d:'R',ArrowUp:'U',w:'U',ArrowDown:'D',s:'D'};if(m[e.key]){e.preventDefault();move(m[e.key])}};let sx=0,sy=0;board.ontouchstart=e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY};board.ontouchend=e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.max(Math.abs(dx),Math.abs(dy))>25)move(Math.abs(dx)>Math.abs(dy)?(dx>0?'R':'L'):(dy>0?'D':'U'))};function reset(){b=Array(16).fill(0);s=0;add();add();draw()}reset();`);
+if(g.mode==="memory")return shell("メモリーマッチ",`<h1>🧠 メモリーマッチ</h1><p>同じ絵柄のペアを見つけよう！</p><p class="score">手数：<b id="moves">0</b>　ペア：<b id="pairs">0</b>/8</p><div id="cards" class="grid cards"></div><button onclick="start()">もう一度</button>`,`let vals,first=null,lock=false,m=0,p=0;function start(){vals=['🍎','🍋','🍇','🍒','⭐','🌙','🐱','🚀', '🍎','🍋','🍇','🍒','⭐','🌙','🐱','🚀'].sort(()=>Math.random()-.5);first=null;lock=false;m=0;p=0;moves.textContent=0;pairs.textContent=0;cards.innerHTML=vals.map((v,i)=>'<button class="card" data-i="'+i+'">?</button>').join('');cards.querySelectorAll('button').forEach(b=>b.onclick=()=>flip(+b.dataset.i,b))}function flip(i,b){if(lock||b.textContent!=='?')return;b.textContent=vals[i];if(first===null){first={i,b};return}m++;moves.textContent=m;if(vals[first.i]===vals[i]){p++;pairs.textContent=p;first=null;if(p===8)setTimeout(()=>alert('クリア！ '+m+'手でした'),250)}else{lock=true;let f=first;first=null;setTimeout(()=>{f.b.textContent='?';b.textContent='?';lock=false},650)}}start();`);
+if(g.mode==="reaction")return shell("反射神経テスト",`<h1>⚡ 反射神経テスト</h1><p>緑に変わったら、すばやくタップ！</p><div id="pad" class="big" style="background:#ffffff20;border-radius:18px;padding:55px 10px;cursor:pointer">スタートを押してね</div><p id="result">ベストタイムを目指そう</p><button onclick="start()">スタート</button>`,`let t,ready=false,timer;pad.onclick=()=>{if(!ready){if(t){clearTimeout(t);t=null;result.textContent='フライング！もう一度スタート';pad.textContent='早すぎ！';pad.style.background='#d94b75'}return}let v=Math.round(performance.now()-t);ready=false;t=null;pad.textContent=v+' ms';pad.style.background='#ffffff20';result.textContent=v<250?'すばらしい反射神経！':'もう一度挑戦！'};function start(){ready=false;pad.textContent='待って...';pad.style.background='#d58b35';result.textContent='緑になったらタップ';clearTimeout(timer);timer=setTimeout(()=>{ready=true;t=performance.now();pad.textContent='今すぐタップ！';pad.style.background='#19b978'},1000+Math.random()*3000)}`);
+if(g.mode==="rps")return shell("じゃんけん",`<h1>✊ じゃんけん</h1><p>コンピューターと勝負しよう！</p><div class="big" id="op">🤖</div><p id="result">手を選んでね</p><div class="row"><button onclick="play(0)">✊ グー</button><button onclick="play(1)">✌️ チョキ</button><button onclick="play(2)">✋ パー</button></div><p class="score" id="score">勝ち 0　負け 0　引き分け 0</p>`,`let w=0,l=0,d=0,icons=['✊','✌️','✋'];function play(x){let y=Math.floor(Math.random()*3);op.textContent=icons[y];if(x===y)d++;else if((x-y+3)%3===2)w++;else l++;result.textContent=x===y?'引き分け！':(x-y+3)%3===2?'あなたの勝ち！':'コンピューターの勝ち！';score.textContent='勝ち '+w+'　負け '+l+'　引き分け '+d}`);
+if(g.mode==="guess")return shell("数字当て",`<h1>🔍 数字当てゲーム</h1><p>1〜100の数字を当てよう！</p><div class="big">?</div><input id="num" type="number" min="1" max="100" placeholder="数字"><button onclick="check()">決定</button><p id="hint">数字を入力してね</p><p class="score">挑戦回数：<b id="tries">0</b></p><button onclick="reset()">新しい数字</button>`,`let answer,attempt=0;function reset(){answer=1+Math.floor(Math.random()*100);attempt=0;tries.textContent=0;hint.textContent='新しい数字を用意したよ！';num.value=''}function check(){let n=Number(num.value);if(!n||n<1||n>100){hint.textContent='1〜100を入力してね';return}attempt++;tries.textContent=attempt;hint.textContent=n===answer?'🎉 正解！ '+attempt+'回で当たり！':n<answer?'もっと大きいよ！':'もっと小さいよ！'}reset();`);
+if(g.mode==="clicker")return shell("連打チャレンジ",`<h1>👆 10秒連打チャレンジ</h1><p>スタートしたらボタンを連打！</p><div class="big" id="count">0</div><button id="tap" style="font-size:22px;padding:22px 35px" onclick="hit()">タップ！</button><p id="status">スタートを押してね</p><button onclick="start()">スタート</button>`,`let n=0,playing=false,end;function start(){n=0;playing=true;count.textContent=0;status.textContent='10秒間連打！';clearTimeout(end);end=setTimeout(()=>{playing=false;status.textContent='終了！ '+n+'回タップできたよ！'},10000)}function hit(){if(playing){n++;count.textContent=n}}`);
+if(g.mode==="ttt")return shell("三目並べ",`<h1>⭕ 三目並べ</h1><p>先攻はあなた（X）です。</p><div id="cells" class="grid" style="grid-template-columns:repeat(3,82px)"></div><p id="status">あなたの番です</p><button onclick="reset()">リセット</button>`,`let a=Array(9).fill(''),done=false;function reset(){a=Array(9).fill('');done=false;status.textContent='あなたの番です';draw()}function draw(){cells.innerHTML=a.map((v,i)=>'<button style="width:82px;height:82px;font-size:32px;margin:0" onclick="play('+i+')">'+v+'</button>').join('')}function winner(){for(let [x,y,z] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]])if(a[x]&&a[x]===a[y]&&a[y]===a[z])return a[x];return a.every(Boolean)?'draw':null}function play(i){if(done||a[i])return;a[i]='X';let w=winner();if(w){finish(w);return}let opts=a.map((v,i)=>v?null:i).filter(v=>v!==null);if(opts.length)a[opts[Math.floor(Math.random()*opts.length)]]='O';w=winner();if(w)finish(w);else status.textContent='あなたの番です';draw()}function finish(w){done=true;status.textContent=w==='draw'?'引き分け！':w==='X'?'あなたの勝ち！':'コンピューターの勝ち！';draw()}reset();`);
+if(g.mode==="runner")return shell("ランナー",`<h1>🏃 ジャンプランナー</h1><p>障害物をジャンプでよけよう！</p><canvas id="cv" width="500" height="210"></canvas><p id="score">スペースキー・タップでジャンプ</p><button onclick="start()">スタート / リスタート</button>`,`let c=cv.getContext('2d'),y=150,vy=0,x=470,run=false,sc=0;function draw(){c.clearRect(0,0,500,210);c.fillStyle='#e7e3ff';c.fillRect(0,175,500,35);c.fillStyle='#fff';c.fillRect(0,0,500,175);c.fillStyle='#5a49d6';c.fillRect(55,y,30,30);c.fillStyle='#ef6b78';c.fillRect(x,145,22,30);c.fillStyle='#27234c';c.font='16px Arial';c.fillText('SCORE '+sc,390,25)}function tick(){if(!run)return;vy+=.7;y+=vy;if(y>150){y=150;vy=0}x-=5;if(x< -25){x=500;sc++;score.textContent='スコア '+sc}if(x<85&&x>45&&y>120){run=false;score.textContent='ゲームオーバー！ スコア '+sc}draw();if(run)requestAnimationFrame(tick)}function jump(){if(run&&y>=150)vy=-12}function start(){y=150;vy=0;x=470;sc=0;run=true;tick()}onkeydown=e=>{if(e.code==='Space'){e.preventDefault();jump()}};cv.onclick=jump;`);
+if(g.mode==="target")return shell("ターゲット",`<h1>🎯 ターゲットタップ</h1><p>10秒間で的を何回タップできる？</p><div id="arena" style="height:240px;background:#ffffff20;border-radius:15px;position:relative;overflow:hidden"><button id="target" style="position:absolute;border-radius:50%;font-size:24px;width:58px;height:58px;padding:0" onclick="hit()">🎯</button></div><p id="score">スコア：0</p><button onclick="start()">スタート</button>`,`let n=0,playing=false,timer;function place(){target.style.left=Math.random()*80+'%';target.style.top=Math.random()*72+'%'}function hit(){if(!playing)return;n++;score.textContent='スコア：'+n;place()}function start(){n=0;playing=true;score.textContent='スコア：0';place();clearTimeout(timer);timer=setTimeout(()=>{playing=false;score.textContent='終了！ '+n+'点！'},10000)}place();`);
+if(g.mode==="whack")return shell("モグラたたき",`<h1>🐹 モグラたたき</h1><p>出てきたモグラをすばやくタップ！</p><div class="grid" style="grid-template-columns:repeat(3,75px)" id="holes"></div><p id="score">スコア：0</p><button onclick="start()">スタート</button>`,`let n=0,active=-1,playing=false,tick;function draw(){holes.innerHTML=Array.from({length:9},(_,i)=>'<button style="width:75px;height:75px;font-size:27px;margin:0" onclick="hit('+i+')">'+(i===active?'🐹':'🕳️')+'</button>').join('')}function hit(i){if(playing&&i===active){n++;score.textContent='スコア：'+n;active=-1;draw()}}function start(){n=0;playing=true;score.textContent='スコア：0';clearInterval(tick);tick=setInterval(()=>{active=Math.floor(Math.random()*9);draw()},650);setTimeout(()=>{playing=false;clearInterval(tick);active=-1;draw();score.textContent='終了！ '+n+'点！'},15000)}draw();`);
+return shell("準備中",`<h1>${g.emoji} ${esc(g.name)}</h1><p>このゲームは追加準備中です。</p><p>プレイできるゲームを順番に増やしていきます。</p>`,``);
 }
-
-const gameGrid = document.getElementById("gameGrid");
-const popularGames = document.getElementById("popularGames");
-const favoriteGames = document.getElementById("favoriteGames");
-const gameCount = document.getElementById("gameCount");
-const emptyMessage = document.getElementById("emptyMessage");
-const gameModal = document.getElementById("gameModal");
-const gameFrame = document.getElementById("gameFrame");
-const gameTitle = document.getElementById("gameTitle");
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
-}
-
-function createCard(game) {
-  const favorite = favorites.includes(game.id);
-
-  return `
-    <article class="game-card" data-id="${game.id}">
-      <button class="favorite-button ${favorite ? "active" : ""}"
-        data-favorite="${game.id}"
-        aria-label="お気に入り">
-        ${favorite ? "♥" : "♡"}
-      </button>
-
-      <div class="game-image"
-        style="background:${categoryColors[game.category]}">
-        ${game.emoji}
-      </div>
-
-      <div class="game-info">
-        <h3>${escapeHTML(game.name)}</h3>
-        <p>${escapeHTML(game.description)}</p>
-        <span class="game-tag">
-          ${escapeHTML(game.categoryName)}
-        </span>
-      </div>
-    </article>
-  `;
-}
-
-function renderGames() {
-  const filtered = games.filter(game => {
-    const matchesCategory =
-      selectedCategory === "all" ||
-      game.category === selectedCategory;
-
-    const matchesSearch =
-      game.name.toLowerCase().includes(searchWord) ||
-      game.categoryName.toLowerCase().includes(searchWord);
-
-    return matchesCategory && matchesSearch;
-  });
-
-  gameGrid.innerHTML = filtered.map(createCard).join("");
-
-  gameCount.textContent = filtered.length + " GAMES";
-
-  emptyMessage.hidden = filtered.length !== 0;
-
-  popularGames.innerHTML = games
-    .filter(game => game.popular)
-    .slice(0, 10)
-    .map(createCard)
-    .join("");
-
-  const favoriteList = games.filter(game =>
-    favorites.includes(game.id)
-  );
-
-  favoriteGames.innerHTML = favoriteList
-    .map(createCard)
-    .join("");
-}
-
-// カテゴリー選択
-document.querySelectorAll(".category").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".category")
-      .forEach(item => item.classList.remove("active"));
-
-    button.classList.add("active");
-    selectedCategory = button.dataset.category;
-    renderGames();
-  });
-});
-
-// 検索
-document.getElementById("searchInput")
-  .addEventListener("input", event => {
-    searchWord = event.target.value.trim().toLowerCase();
-    renderGames();
-  });
-
-// お気に入りとゲーム起動
-document.addEventListener("click", event => {
-  const favoriteButton = event.target.closest("[data-favorite]");
-
-  if (favoriteButton) {
-    const id = favoriteButton.dataset.favorite;
-
-    if (favorites.includes(id)) {
-      favorites = favorites.filter(item => item !== id);
-    } else {
-      favorites.push(id);
-    }
-
-    localStorage.setItem(
-      "gamepark-favorites",
-      JSON.stringify(favorites)
-    );
-
-    renderGames();
-    return;
-  }
-
-  const card = event.target.closest(".game-card");
-
-  if (card) {
-    const game = games.find(
-      item => item.id === card.dataset.id
-    );
-
-    if (game) openGame(game);
-  }
-});
-
-// ゲーム画面
-function openGame(game) {
-  gameTitle.textContent = game.name;
-
-  if (game.embedUrl) {
-    gameFrame.removeAttribute("srcdoc");
-    gameFrame.src = game.embedUrl;
-  } else {
-    gameFrame.removeAttribute("src");
-    gameFrame.srcdoc = `
-      <html>
-      <body style="
-        margin:0;
-        background:#171724;
-        color:white;
-        font-family:Arial,sans-serif;
-        display:grid;
-        place-items:center;
-        height:100vh;
-        text-align:center;">
-        <div>
-          <div style="font-size:65px">${game.emoji}</div>
-          <h2>${escapeHTML(game.name)}</h2>
-          <p>このゲームは掲載準備中です。</p>
-          <p>利用許可のあるゲームを順番に追加します。</p>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  gameModal.hidden = false;
-  document.body.style.overflow = "hidden";
-}
-
-function closeGame() {
-  gameModal.hidden = true;
-  gameFrame.removeAttribute("src");
-  gameFrame.removeAttribute("srcdoc");
-  document.body.style.overflow = "";
-}
-
-document.getElementById("closeGame")
-  .addEventListener("click", closeGame);
-
-gameModal.addEventListener("click", event => {
-  if (event.target === gameModal) closeGame();
-});
-
-document.getElementById("fullscreenButton")
-  .addEventListener("click", () => {
-    if (gameFrame.requestFullscreen) {
-      gameFrame.requestFullscreen();
-    }
-  });
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !gameModal.hidden) {
-    closeGame();
-  }
-});
-
-// 最初の表示
-renderGames();
-
-console.log("GAME PARK: " + games.length + " games registered");
+function openGame(g){$("gameTitle").textContent=g.name;$("gameFrame").srcdoc=gameDocument(g);$("gameModal").hidden=false;document.body.style.overflow="hidden"}
+function closeGame(){$("gameModal").hidden=true;$("gameFrame").src="about:blank";$("gameFrame").srcdoc="";document.body.style.overflow=""}
+$("closeGame").addEventListener("click",closeGame);$("gameModal").addEventListener("click",e=>{if(e.target===$("gameModal"))closeGame()});$("fullscreenButton").addEventListener("click",()=>{const f=$("gameFrame");if(f.requestFullscreen)f.requestFullscreen()});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("gameModal").hidden)closeGame()});
+render();
