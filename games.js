@@ -46,7 +46,57 @@ const playable = {
 "rpg-7":"monster",
 "rpg-8":"quest",
 "rpg-9":"magicdice",
-"rpg-10":"guild"
+"rpg-10":"guild",
+"action-2":"extra-51",
+"action-3":"extra-52",
+"action-4":"extra-53",
+"action-5":"extra-54",
+"action-6":"extra-55",
+"action-7":"extra-56",
+"action-8":"extra-57",
+"action-9":"extra-58",
+"action-10":"extra-59",
+"racing-3":"extra-60",
+"racing-4":"extra-61",
+"racing-5":"extra-62",
+"racing-6":"extra-63",
+"racing-7":"extra-64",
+"racing-8":"extra-65",
+"racing-9":"extra-66",
+"racing-10":"extra-67",
+"adventure-3":"extra-68",
+"sports-4":"extra-69",
+"sports-5":"extra-70",
+"sports-6":"extra-71",
+"sports-7":"extra-72",
+"sports-8":"extra-73",
+"sports-9":"extra-74",
+"sports-10":"extra-75",
+"horror-1":"extra-76",
+"horror-2":"extra-77",
+"horror-3":"extra-78",
+"horror-4":"extra-79",
+"horror-5":"extra-80",
+"horror-6":"extra-81",
+"horror-7":"extra-82",
+"horror-8":"extra-83",
+"horror-9":"extra-84",
+"horror-10":"extra-85",
+"simulation-2":"extra-86",
+"simulation-3":"extra-87",
+"simulation-4":"extra-88",
+"simulation-5":"extra-89",
+"simulation-6":"extra-90",
+"simulation-7":"extra-91",
+"simulation-8":"extra-92",
+"simulation-9":"extra-93",
+"simulation-10":"extra-94",
+"casual-5":"extra-95",
+"casual-6":"extra-96",
+"casual-7":"extra-97",
+"casual-8":"extra-98",
+"casual-9":"extra-99",
+"casual-10":"extra-100"
 };
 const games=categories.flatMap((cat,ci)=>cat.names.map((name,i)=>({id:`${cat.id}-${i+1}`,name,category:cat.id,categoryName:cat.name,emoji:cat.emoji,description:`${cat.name}のゲーム`,popular:i<3&&ci<4,mode:playable[`${cat.id}-${i+1}`]||null})));
 const palette={action:"#ffe2dc",racing:"#dceeff",puzzle:"#f0e3ff",shooting:"#dce5ff",adventure:"#ddf3e4",rpg:"#ffe8ce",sports:"#dff4e8",horror:"#e7e0ee",simulation:"#fff0d7",casual:"#ffe1ed"};
@@ -115,6 +165,49 @@ if(g.mode==="monster")return shell("モンスターテイマー",`<h1>👾 モ�
 if(g.mode==="quest")return shell("勇者のクエスト",`<h1>📜 勇者のクエスト</h1><p>冒険の選択をして経験値を集めよう！</p><div class="big" id="scene">森の入口</div><div class="row"><button onclick="choose(0)">🌲 森へ</button><button onclick="choose(1)">🕳️ 洞窟へ</button><button onclick="choose(2)">🏘️ 村へ</button></div><p id="xp">経験値：0</p><p id="msg">どこへ進む？</p>`,`let n=0;function choose(i){let a=[['森で薬草を発見','🌿',5],['洞窟で魔物と遭遇','👾',Math.random()>.5?10:-3],['村人から依頼を受けた','🏘️',3]][i];scene.textContent=a[1];n=Math.max(0,n+a[2]);xp.textContent='経験値：'+n;msg.textContent=a[0]+' ('+a[2]+' XP)'}`);
 if(g.mode==="magicdice")return shell("魔法サイコロ",`<h1>🎲 魔法サイコロ</h1><p>サイコロの目で魔法を発動！</p><div class="big" id="die">🎲</div><button onclick="roll()">振る！</button><p id="msg">何が出るかな？</p>`,`function roll(){let n=1+Math.floor(Math.random()*6);die.textContent=['','🔥','💧','🌿','⚡','❄️','🌈'][n];msg.textContent=['','炎の魔法！','水の魔法！','回復の魔法！','雷の魔法！','氷の魔法！','レインボー魔法！'][n]}roll();`);
 if(g.mode==="guild")return shell("冒険者ギルド",`<h1>🏰 冒険者ギルド</h1><p>依頼を達成してコインを集めよう！</p><div class="big" id="coins">🪙 0</div><div class="row"><button onclick="job(2)">🐾 薬草採集 (+2)</button><button onclick="job(5)">🗺️ 探索 (+5)</button><button onclick="job(8)">🐉 討伐 (+8)</button></div><p id="msg">好きな依頼を選ぼう</p>`,`let n=0;function job(v){n+=v;coins.textContent='🪙 '+n;msg.textContent='依頼達成！報酬 '+v+' コイン！'}`);
+
+
+if(g.mode.startsWith("extra-")){
+const n=Number(g.mode.slice(6)),type=(n-51)%10,level=Math.floor((n-51)/10)+1;
+const body=`<h1>${g.emoji} ${esc(g.name)}</h1><p id="intro">ミニゲームに挑戦！</p><div class="big" id="stage">🎮</div><div id="actions" class="row"></div><p id="status">スタートを押してね</p><p id="score">スコア：0</p><button onclick="start()">スタート / もう一度</button>`;
+const script=`
+let scoreVal=0,turn=0,answer=0,seq=[],pos=0,life=3,timer=null,ready=false,stamp=0;
+const $=id=>document.getElementById(id);
+function score(){ $('score').textContent='スコア：'+scoreVal; }
+function start(){
+clearInterval(timer);scoreVal=0;turn=0;life=3;ready=false;score();
+if(${type}===0){$('intro').textContent='光るターゲットを素早くタップ！';target();}
+if(${type}===1){$('intro').textContent='表示された順番を覚えて入力しよう';seq=Array.from({length:Math.min(3+${level},7)},()=>Math.floor(Math.random()*4));$('stage').textContent=seq.map(x=>['⬆️','➡️','⬇️','⬅️'][x]).join(' ');$('actions').innerHTML='<button onclick="showChoices()">覚えた！</button>'; $('status').textContent='順番を覚えてからボタンを押してね';}
+if(${type}===2){$('intro').textContent='制限時間内に計算問題を解こう！';math();timer=setInterval(()=>{turn++;if(turn>=10){clearInterval(timer);$('status').textContent='終了！ '+scoreVal+'点';$('actions').innerHTML='';}},4000);}
+if(${type}===3){$('intro').textContent='隠された数字を当てよう！';answer=1+Math.floor(Math.random()*(10+${level}*5));$('stage').textContent='❓';$('actions').innerHTML='<input id="guess" type="number" placeholder="数字"><button onclick="guess()">予想</button>'; $('status').textContent='ヒント：1〜'+(10+${level}*5);}
+if(${type}===4){$('intro').textContent='緑の合図が出たらタップ！';$('stage').textContent='🔴';$('actions').innerHTML='<button onclick="react()">タップ！</button>'; $('status').textContent='緑になるまで待って…';timer=setTimeout(()=>{ready=true;stamp=Date.now();$('stage').textContent='🟢'},1200+Math.random()*2500);}
+if(${type}===5){$('intro').textContent='障害物を避けて進もう！';lane=1;road();}
+if(${type}===6){$('intro').textContent='3つの箱から宝物を探そう';treasure=Math.floor(Math.random()*3);$('stage').textContent='🎁 🎁 🎁';$('actions').innerHTML=[0,1,2].map(i=>'<button onclick="box('+i+')">箱 '+(i+1)+'</button>').join('');$('status').textContent='当たりは1つ！';}
+if(${type}===7){$('intro').textContent='相手に勝ってポイントを集めよう';$('stage').textContent='⚔️';$('actions').innerHTML=['⚔️','🛡️','✨'].map((v,i)=>'<button onclick="fight('+i+')">'+v+'</button>').join('');$('status').textContent='攻撃・防御・魔法を選んでね';}
+if(${type}===8){$('intro').textContent='体力と食料を管理して5日間生き残ろう';hp=5;food=3;day=0;survive();}
+if(${type}===9){$('intro').textContent='お題と同じ色を選ぼう！';colorRound();}
+}
+function target(){let c=['🎯','⭐','💎','🍎','⚽'][Math.floor(Math.random()*5)];$('stage').textContent=c;$('actions').innerHTML='<button style="font-size:28px" onclick="hit()">'+c+'</button><button onclick="miss()">別のボタン</button>';$('status').textContent='同じマークを押そう';}
+function hit(){scoreVal++;score();turn++;if(turn>=10){$('status').textContent='クリア！10回成功';$('actions').innerHTML='';}else target()}
+function miss(){scoreVal=Math.max(0,scoreVal-1);score();target()}
+function showChoices(){pos=0;$('stage').textContent='順番を入力';$('actions').innerHTML=['⬆️','➡️','⬇️','⬅️'].map((v,i)=>'<button onclick="memory('+i+')">'+v+'</button>').join('');}
+function memory(i){if(i===seq[pos]){pos++;if(pos===seq.length){scoreVal+=10;score();$('status').textContent='正解！';$('actions').innerHTML='<button onclick="start()">次へ</button>';} }else{$('status').textContent='間違い！もう一度スタート';$('actions').innerHTML='';}}
+function math(){let a=1+Math.floor(Math.random()*20),b=1+Math.floor(Math.random()*20);answer=a+b;$('stage').textContent=a+' + '+b+' = ?';$('actions').innerHTML='<input id="ans" type="number"><button onclick="checkMath()">回答</button>';}
+function checkMath(){if(Number($('ans').value)===answer){scoreVal++;score();$('status').textContent='正解！';}else $('status').textContent='残念！答えは '+answer;$('actions').innerHTML='<button onclick="math()">次の問題</button>';}
+function guess(){let v=Number($('guess').value);if(v===answer){scoreVal+=10;score();$('status').textContent='大正解！';}else $('status').textContent=v<answer?'もっと大きい数字！':'もっと小さい数字！';}
+function react(){if(!ready){$('status').textContent='まだ早い！';return}ready=false;$('status').textContent='反応時間：'+(Date.now()-stamp)+' ms';scoreVal=Math.max(0,100-Math.floor((Date.now()-stamp)/10));score();}
+let lane=1;function road(){$('stage').textContent=['🚗','🚙','🏎️'][lane];$('actions').innerHTML='<button onclick="steer(-1)">⬅️</button><button onclick="steer(1)">➡️</button><button onclick="obstacle()">進む</button>';$('status').textContent='障害物を避けて進もう';}
+function steer(d){lane=Math.max(0,Math.min(2,lane+d));road()}
+function obstacle(){let bad=Math.floor(Math.random()*3);if(bad===lane){$('stage').textContent='💥';$('status').textContent='衝突！ スコア '+scoreVal;$('actions').innerHTML='<button onclick="start()">再挑戦</button>';}else{scoreVal++;score();$('status').textContent='回避成功！';road()}}
+let treasure=0;function box(i){if(i===treasure){scoreVal+=10;score();$('stage').textContent='💎';$('status').textContent='宝物発見！';}else{$('stage').textContent='🕸️';$('status').textContent='はずれ！';}$('actions').innerHTML='<button onclick="start()">次の探索</button>';}
+function fight(i){let enemy=Math.floor(Math.random()*3);if(i===enemy){scoreVal+=5;$('status').textContent='相手の技を読んだ！勝利！';}else if((i+1)%3===enemy){$('status').textContent='相手に負けた！';}else{$('status').textContent='引き分け！';}score();$('actions').innerHTML='<button onclick="start()">次の対戦</button>';}
+let hp=5,food=3,day=0;function survive(){ $('stage').textContent='❤️ '+hp+'　🍎 '+food;$('actions').innerHTML='<button onclick="surv(0)">食料を探す</button><button onclick="surv(1)">休む</button><button onclick="surv(2)">冒険する</button>';$('status').textContent='生存 '+day+'/5 日';}
+function surv(a){day++;food--;if(a===0)food+=2;if(a===1)hp=Math.min(5,hp+1);if(a===2){if(Math.random()>.5)scoreVal+=2;else hp--;}if(food<0)hp--;score();if(day>=5&&hp>0){$('status').textContent='5日間生存！クリア！';$('actions').innerHTML='';return}if(hp<=0){$('status').textContent='体力切れ！再挑戦してね';$('actions').innerHTML='';return}survive();}
+function colorRound(){let names=['赤','青','緑','黄'],colors=['#ef4444','#3b82f6','#22c55e','#eab308'],x=Math.floor(Math.random()*4);$('stage').textContent=names[x]+' 色';$('stage').style.color=colors[x];$('actions').innerHTML=names.map((v,i)=>'<button style="background:'+colors[i]+';color:white" onclick="pickColor('+i+','+x+')">'+v+'</button>').join('');}
+function pickColor(i,x){if(i===x){scoreVal++;$('status').textContent='正解！';}else $('status').textContent='もう一度！';score();colorRound();}
+start();`;
+return shell(g.name,body,script);
+}
 
 return shell("準備中",`<h1>${g.emoji} ${esc(g.name)}</h1><p>このゲームは追加準備中です。</p><p>プレイできるゲームを順番に増やしていきます。</p>`,``);
 }
