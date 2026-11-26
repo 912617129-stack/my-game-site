@@ -105,7 +105,7 @@ try{favorites=JSON.parse(localStorage.getItem("gamepark-favorites")||"[]")}catch
 const $=id=>document.getElementById(id);
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function card(g){let fav=favorites.includes(g.id);return `<article class="game-card" data-id="${g.id}"><button class="favorite-button ${fav?"active":""}" data-favorite="${g.id}" aria-label="お気に入り">${fav?"♥":"♡"}</button>${g.mode?'<span class="play-pill">PLAY</span>':''}<div class="game-image" style="background:${palette[g.category]}">${g.emoji}</div><div class="game-info"><h3>${esc(g.name)}</h3><p>${esc(g.description)}</p><span class="game-tag">${esc(g.categoryName)}</span></div></article>`}
-function render(){const list=games.filter(g=>(selectedCategory==="all"||g.category===selectedCategory)&&(g.name.toLowerCase().includes(searchWord)||g.categoryName.toLowerCase().includes(searchWord)));$("gameGrid").innerHTML=list.map(card).join("");$("gameCount").textContent=`${list.length} / 100 GAMES`;$("emptyMessage").hidden=list.length!==0;$("popularGames").innerHTML=games.filter(g=>g.popular).slice(0,10).map(card).join("");const fav=games.filter(g=>favorites.includes(g.id));$("favoriteGames").innerHTML=fav.map(card).join("");$("noFavorites").hidden=fav.length>0}
+function render(){const list=games.filter(g=>(selectedCategory==="all"||g.category===selectedCategory)&&(g.name.toLowerCase().includes(searchWord)||g.categoryName.toLowerCase().includes(searchWord)));$("gameGrid").innerHTML=list.map(card).join("");$("gameCount").textContent=`${list.length} / 100 GAMES`;$("emptyMessage").hidden=list.length!==0;const featuredIds=["racing-1","action-2","action-3","puzzle-1"];$("featuredGrid").innerHTML=games.filter(g=>featuredIds.includes(g.id)).map(card).join("");$("popularGames").innerHTML=games.filter(g=>g.popular).slice(0,10).map(card).join("");const fav=games.filter(g=>favorites.includes(g.id));$("favoriteGames").innerHTML=fav.map(card).join("");$("noFavorites").hidden=fav.length>0}
 document.querySelectorAll(".category").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".category").forEach(x=>x.classList.remove("active"));b.classList.add("active");selectedCategory=b.dataset.category;render()}));
 $("searchInput").addEventListener("input",e=>{searchWord=e.target.value.trim().toLowerCase();render()});
 document.addEventListener("click",e=>{const fb=e.target.closest("[data-favorite]");if(fb){const id=fb.dataset.favorite;favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];localStorage.setItem("gamepark-favorites",JSON.stringify(favorites));render();return}const c=e.target.closest(".game-card");if(c){const g=games.find(x=>x.id===c.dataset.id);if(g)openGame(g)}});
@@ -167,6 +167,61 @@ $('start').onclick=reset;$('use').onclick=useItem;$('garage').onclick=()=>{$('ga
 [['left','left'],['right','right'],['gas','gas'],['brake','brake']].forEach(([id,k])=>{let b=$(id);b.onpointerdown=e=>{e.preventDefault();keys[k]=true};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>keys[k]=false});
 document.addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.key==='x'||e.key==='X')useItem()});document.addEventListener('keyup',e=>keys[e.key]=false);
 ui();draw();`)
+
+if(g.id==="action-3")return shell("MONSTER ARENA: SURVIVOR",`
+<style>
+.arena{width:min(100%,900px)}#arenaCanvas{width:100%;height:auto;display:block;background:#10162d;border:2px solid #ffffff35;border-radius:16px;touch-action:none}
+.ahud{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:9px 0}.astat{background:#ffffff20;border-radius:10px;padding:7px 11px;font-weight:800;font-size:13px}
+.acontrols{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.acontrols button{min-width:62px}.ahelp{font-size:13px;color:#dedaff}
+</style>
+<div class="arena"><h1>👹 MONSTER ARENA</h1><p>押し寄せるモンスターを撃退！経験値を集めて能力を選び、ボスを倒そう。</p>
+<div class="ahud"><span class="astat" id="aWave">WAVE 1</span><span class="astat" id="aHp">❤️ 5</span><span class="astat" id="aXp">XP 0</span><span class="astat" id="aScore">SCORE 0</span></div>
+<canvas id="arenaCanvas" width="900" height="500"></canvas>
+<div class="ahud"><span class="astat" id="aStatus">敵に近づきすぎるな！</span><span class="astat" id="aLevel">LEVEL 1</span></div>
+<div class="acontrols"><button id="aLeft">◀</button><button id="aUp">▲</button><button id="aDown">▼</button><button id="aRight">▶</button><button id="aDash">⚡ ダッシュ</button></div>
+<p class="ahelp">PC：WASD / 矢印キーで移動・自動攻撃　スマホ：画面下のボタン　レベルアップ時は強化を選択！</p>
+<button id="aStart" class="nprimary">▶ バトル開始 / もう一度</button></div>
+`,`
+const c=document.getElementById('arenaCanvas'),x=c.getContext('2d');
+const $=id=>document.getElementById(id);
+let keys={},p,foes=[],shots=[],orbs=[],wave=1,score=0,level=1,xp=0,hp=5,playing=false,frame=0,dash=0,upgrade=false,choice=[];
+const upgrades=[['⚔️ 攻撃速度UP','攻撃間隔が短くなる',()=>p.rate=Math.max(13,p.rate-5)],['💥 パワーUP','弾のダメージ+1',()=>p.damage++],['💨 スピードUP','移動速度+0.5',()=>p.speed+=.5],['❤️ 回復','体力を2回復',()=>hp=Math.min(7,hp+2)],['🌀 多方向ショット','弾が2方向に増える',()=>p.multi=Math.min(3,p.multi+1)]];
+function reset(){p={x:450,y:250,r:15,speed:3.2,rate:35,tick:0,damage:1,multi:1};foes=[];shots=[];orbs=[];wave=1;score=0;level=1;xp=0;hp=5;frame=0;dash=0;playing=true;upgrade=false;spawnWave();ui()}
+function spawnWave(){let count=5+wave*3;for(let i=0;i<count;i++){let side=Math.floor(Math.random()*4),ex=side===0?0:side===1?900:Math.random()*900,ey=side===2?0:side===3?500:Math.random()*500;foes.push({x:ex,y:ey,r:wave%5===0?23:12+Math.random()*5,hp:wave%5===0?7+wave:2+Math.floor(wave/3),boss:wave%5===0,speed:(wave%5===0?1:1.05)+Math.random()*.55+wave*.035,hit:0})}}
+function ui(){$('aWave').textContent='WAVE '+wave;$('aHp').textContent='❤️ '+hp;$('aXp').textContent='XP '+xp;$('aScore').textContent='SCORE '+score;$('aLevel').textContent='LEVEL '+level}
+function levelUp(){level++;xp-=5+level*2;upgrade=true;choice=[...upgrades].sort(()=>Math.random()-.5).slice(0,3);$('aStatus').textContent='強化を選んでね';draw();choice.forEach((u,i)=>{let b=document.createElement('button');b.textContent=u[0]+'：'+u[1];b.onclick=()=>{u[2]();upgrade=false;$('aStatus').textContent='戦闘再開！';document.querySelectorAll('.upgradeChoice').forEach(e=>e.remove());ui()};b.className='upgradeChoice';$('aStart').before(b)})}
+function nearest(){let best=null,d=1e9;foes.forEach(f=>{let q=Math.hypot(f.x-p.x,f.y-p.y);if(q<d){d=q;best=f}});return best}
+function update(){if(!playing||upgrade)return;frame++;let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);let len=Math.hypot(dx,dy)||1;p.x=Math.max(18,Math.min(882,p.x+dx/len*p.speed*(dash?2.5:1)));p.y=Math.max(18,Math.min(482,p.y+dy/len*p.speed*(dash?2.5:1)));if(dash)dash--;
+if(++p.tick>=p.rate){p.tick=0;let f=nearest();if(f){let a=Math.atan2(f.y-p.y,f.x-p.x);for(let j=0;j<p.multi;j++){let an=a+(j-(p.multi-1)/2)*.22;shots.push({x:p.x,y:p.y,vx:Math.cos(an)*7,vy:Math.sin(an)*7,life:65,damage:p.damage})}}}
+shots.forEach(s=>{s.x+=s.vx;s.y+=s.vy;s.life--;foes.forEach(f=>{if(Math.hypot(s.x-f.x,s.y-f.y)<f.r+5&&s.life>0){f.hp-=s.damage;s.life=0;if(f.hp<=0){score+=f.boss?250:20;orbs.push({x:f.x,y:f.y});f.dead=true}}})});shots=shots.filter(s=>s.life>0&&s.x>-10&&s.x<910&&s.y>-10&&s.y<510);foes=foes.filter(f=>!f.dead);
+foes.forEach(f=>{let a=Math.atan2(p.y-f.y,p.x-f.x);f.x+=Math.cos(a)*f.speed;f.y+=Math.sin(a)*f.speed;if(Math.hypot(p.x-f.x,p.y-f.y)<p.r+f.r&&frame%35===0){hp--;ui();if(hp<=0){playing=false;$('aStatus').textContent='GAME OVER！スコア '+score+'　もう一度挑戦しよう';$('aStart').textContent='▶ リトライ'}}});
+orbs.forEach(o=>{if(Math.hypot(p.x-o.x,p.y-o.y)<30){o.got=true;xp++;if(xp>=5+level*2)levelUp()}});orbs=orbs.filter(o=>!o.got);
+if(!foes.length){wave++;spawnWave();$('aStatus').textContent=wave%5===1?'WAVE CLEAR！':'敵の増援が来た！'}ui()}
+function draw(){x.clearRect(0,0,900,500);x.fillStyle='#172343';x.fillRect(0,0,900,500);x.strokeStyle='#ffffff0c';for(let i=0;i<900;i+=40){x.beginPath();x.moveTo(i,0);x.lineTo(i,500);x.stroke()}for(let i=0;i<500;i+=40){x.beginPath();x.moveTo(0,i);x.lineTo(900,i);x.stroke()}
+orbs.forEach(o=>{x.fillStyle='#65f5c2';x.beginPath();x.arc(o.x,o.y,6,0,7);x.fill()});shots.forEach(s=>{x.fillStyle='#ffe16a';x.beginPath();x.arc(s.x,s.y,5,0,7);x.fill()});foes.forEach(f=>{x.fillStyle=f.boss?'#ff547d':'#a76cff';x.beginPath();x.arc(f.x,f.y,f.r,0,7);x.fill();x.fillStyle='#fff';x.fillRect(f.x-f.r,f.y-f.r-9,f.r*2,3);x.fillStyle='#ff596f';x.fillRect(f.x-f.r,f.y-f.r-9,f.r*2*Math.max(0,f.hp)/(f.boss?7+wave:2+Math.floor(wave/3)),3)});x.fillStyle='#63e8ff';x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill();x.fillStyle='#fff';x.fillRect(p.x-7,p.y-4,14,4);if(!playing){x.fillStyle='#0009';x.fillRect(0,0,900,500);x.fillStyle='#fff';x.font='bold 34px sans-serif';x.textAlign='center';x.fillText('MONSTER ARENA',450,225);x.font='18px sans-serif';x.fillText('開始ボタンを押してバトル！',450,265)}}
+function loop(){update();draw();requestAnimationFrame(loop)}$('aStart').onclick=()=>{document.querySelectorAll('.upgradeChoice').forEach(e=>e.remove());reset()};[['aLeft','ArrowLeft'],['aRight','ArrowRight'],['aUp','ArrowUp'],['aDown','ArrowDown']].forEach(([id,k])=>{let b=$(id);b.onpointerdown=e=>{e.preventDefault();keys[k]=true};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>keys[k]=false});$('aDash').onclick=()=>dash=45;document.addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault()});document.addEventListener('keyup',e=>keys[e.key]=false);draw();loop();
+`);
+if(g.id==="puzzle-1")return shell("GEM QUEST: MATCH 3",`
+<style>
+.gemgame{width:min(100%,650px)}.gemhud{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:12px 0}.gemstat{background:#ffffff20;padding:8px 12px;border-radius:10px;font-weight:900}.gemboard{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-width:520px;margin:15px auto;touch-action:manipulation}.gem{aspect-ratio:1;border:2px solid #ffffff25;border-radius:12px;font-size:clamp(18px,5vw,30px);background:#ffffff18;cursor:pointer;margin:0;padding:0;box-shadow:inset 0 -5px 0 #0002}.gem.sel{outline:3px solid #ffe16a;transform:scale(.94)}.gemhelp{font-size:13px;color:#dedaff}
+</style>
+<div class="gemgame"><h1>💎 GEM QUEST</h1><p>宝石を入れ替えて3つ以上そろえよう！連鎖コンボで高得点を狙え。</p>
+<div class="gemhud"><span class="gemstat" id="gScore">SCORE 0</span><span class="gemstat" id="gMoves">MOVES 25</span><span class="gemstat" id="gGoal">GOAL 1200</span><span class="gemstat" id="gStage">STAGE 1</span></div>
+<div class="gemboard" id="gemBoard"></div><p class="gemhelp" id="gMessage">隣り合う宝石を2つ選んで入れ替えよう。4つ以上でボーナス！</p>
+<button id="gNew" class="nprimary">▶ 新しいステージ</button></div>
+`,`
+const board=document.getElementById('gemBoard'),$=id=>document.getElementById(id),icons=['🔴','🔵','🟢','🟡','🟣','💎'];
+let a=[],sel=-1,score=0,moves=25,stage=1,lock=false;
+function rand(){return Math.floor(Math.random()*6)}
+function fresh(){a=Array.from({length:64},rand);for(let i=0;i<8;i++)for(let j=0;j<8;j++){let k=i*8+j;if(j>=2&&a[k]===a[k-1]&&a[k]===a[k-2]||i>=2&&a[k]===a[k-8]&&a[k]===a[k-16])a[k]=(a[k]+1+rand()%5)%6}sel=-1;score=0;moves=25;lock=false;message('3つ以上そろえて目標スコアを目指そう！');draw()}
+function matches(){let set=new Set();for(let r=0;r<8;r++)for(let c=0;c<8;c++){let k=r*8+c,v=a[k];if(c<6&&v===a[k+1]&&v===a[k+2]){let n=c+3;while(n<8&&a[r*8+n]===v)n++;for(let q=c;q<n;q++)set.add(r*8+q)}if(r<6&&v===a[k+8]&&v===a[k+16]){let n=r+3;while(n<8&&a[n*8+c]===v)n++;for(let q=r;q<n;q++)set.add(q*8+c)}}return set}
+function message(t){$('gMessage').textContent=t}
+function draw(){board.innerHTML=a.map((v,i)=>'<button class="gem '+(sel===i?'sel':'')+'" data-i="'+i+'">'+icons[v]+'</button>').join('');$('gScore').textContent='SCORE '+score;$('gMoves').textContent='MOVES '+moves;$('gGoal').textContent='GOAL '+(1200+stage*250);$('gStage').textContent='STAGE '+stage}
+function cascade(){let m=matches();if(!m.size){lock=false;draw();if(score>=1200+stage*250){message('STAGE CLEAR！次のステージへ進もう！');$('gNew').textContent='次のステージ ▶'}else if(moves<=0){message('終了！新しいステージで再挑戦しよう');$('gNew').textContent='もう一度挑戦'}return}let bonus=m.size>=4?m.size*25:0;score+=m.size*60+bonus;message(m.size+'個消し！ '+(m.size>=4?'ボーナス獲得！':'')+'連鎖を狙おう');m.forEach(k=>a[k]=-1);draw();setTimeout(()=>{for(let c=0;c<8;c++){let vals=[];for(let r=7;r>=0;r--)if(a[r*8+c]>=0)vals.push(a[r*8+c]);while(vals.length<8)vals.push(rand());for(let r=7;r>=0;r--)a[r*8+c]=vals[7-r]}setTimeout(cascade,180)},160)}
+board.addEventListener('click',e=>{let b=e.target.closest('[data-i]');if(!b||lock||moves<=0||score>=1200+stage*250)return;let i=+b.dataset.i;if(sel<0){sel=i;draw();return}let r=Math.floor(i/8),c=i%8,sr=Math.floor(sel/8),sc=sel%8;if(Math.abs(r-sr)+Math.abs(c-sc)!==1){sel=i;draw();return}let old=a[i];a[i]=a[sel];a[sel]=old;let m=matches();if(!m.size){old=a[i];a[i]=a[sel];a[sel]=old;message('そこは消えないみたい。別の組み合わせを探そう！')}else{moves--;lock=true;cascade()}sel=-1;draw()});
+$('gNew').onclick=()=>{if(score>=1200+stage*250)stage++;else if(moves<=0)stage=1;$('gNew').textContent='▶ 新しいステージ';fresh()};fresh();
+`);
+
 if(g.id==="action-2")return shell("NINJA LEGENDS",`
 <style>
 .ninja{width:min(100%,900px)}#ninjaCanvas{width:100%;height:auto;display:block;background:#101a38;border:2px solid #ffffff40;border-radius:16px;touch-action:none}.nhud{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:9px 0}.nstat{background:#ffffff20;border-radius:10px;padding:7px 11px;font-weight:800;font-size:13px}.ncontrols{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.ncontrols button{min-width:58px}.nprimary{background:#ffe16a;color:#38255e}.nhelp{font-size:13px;color:#ddd8ff}
