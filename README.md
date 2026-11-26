@@ -1,13 +1,11 @@
-# GAME PARK 本格ゲーム第4弾
+# GAME PARK おすすめ表示修正版
 
-本格化したゲームをトップの「本格化おすすめ」に表示します。
-
-## 今回の新規5タイトル
-- STARFALL DEFENDER：宇宙船シューティング、ウェーブ、ボス、ベストスコア
-- JUNGLE QUEST：遺跡探索、カギ集め、罠、エリア進行
-- HEROES OF AETHER：ターン制RPG、敵5種、レベルアップ、魔法、回復薬
-- STREET SOCCER CUP：5本勝負のPK、コースと強さの選択
-- TINY TOWN BUILDER：街づくり、資金・住民・電力・満足度の管理
+本格化おすすめ欄の表示処理をより堅牢に修正しました。
+- おすすめ9タイトルをIDで明示的に取得
+- 表示先が存在するか確認してから描画
+- おすすめ欄とカードの表示をCSSで明示
+- `games.js?v=featured5` に変更し、ブラウザの古いJavaScriptキャッシュを回避しやすくしました
 
 ## 更新方法
-ZIPを解凍し、中の `index.html` `style.css` `games.js` をGitHubリポジトリの同名ファイルに上書きアップロードしてください。
+ZIPを解凍し、`index.html` `style.css` `games.js` の3ファイルをGitHubリポジトリの同名ファイルに上書きしてください。
+GitHub Pages反映後、Windows/Chromebookなら `Ctrl + Shift + R` で強制再読み込みしてください。

@@ -24,3 +24,9 @@
 .featured-section .game-card{border:1px solid rgba(255,205,92,.48);box-shadow:0 12px 34px rgba(14,10,40,.22)}
 .featured-section .game-card:before{content:"⭐ 本格ゲーム";position:absolute;z-index:2;top:12px;left:12px;padding:6px 10px;border-radius:999px;background:linear-gradient(120deg,#ffdf78,#ffad45);color:#38234f;font-size:11px;font-weight:900;letter-spacing:.02em}
 .featured-section .game-card .play-pill{top:48px}
+
+/* Featured games visibility fix */
+#featuredGames{display:block!important;visibility:visible!important;min-height:160px}
+#featuredGames #featuredGrid{display:grid!important;min-height:90px}
+#featuredGames .game-card{display:block!important;visibility:visible!important;opacity:1!important}
+#featuredGames .section-heading{display:flex!important}
