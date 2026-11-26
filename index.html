@@ -1,86 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="GAME PARK - たくさんの無料ブラウザーゲームを楽しもう！">
-  <title>GAME PARK - 無料オンラインゲーム</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="games.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17152f">
+<meta name="description" content="GAME PARK — 100タイトルの無料ブラウザーゲーム。好きなゲームを見つけて今すぐプレイ！">
+<title>GAME PARK | いつでも、ここが遊び場。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="games.js" defer></script>
 </head>
 <body>
-  <header class="header">
-    <a href="index.html" class="logo"><span class="logo-icon">G</span> GAME PARK</a>
-    <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="ゲームを検索..." aria-label="ゲームを検索"></label>
-    <button class="menu-button" id="menuButton" aria-label="メニュー">☰</button>
-  </header>
-
-  <nav class="category-nav" id="categoryNav" aria-label="ゲームカテゴリー">
-    <button class="category active" data-category="all">すべて</button>
-    <button class="category" data-category="action">⚔️ アクション</button>
-    <button class="category" data-category="racing">🏎️ レース</button>
-    <button class="category" data-category="puzzle">🧩 パズル</button>
-    <button class="category" data-category="shooting">🚀 シューティング</button>
-    <button class="category" data-category="adventure">🗺️ 冒険</button>
-    <button class="category" data-category="rpg">🏰 RPG</button>
-    <button class="category" data-category="sports">⚽ スポーツ</button>
-    <button class="category" data-category="horror">👻 ホラー</button>
-    <button class="category" data-category="simulation">🏗️ シミュレーション</button>
-    <button class="category" data-category="casual">🎲 カジュアル</button>
-  </nav>
-
-  <main class="main-content">
-    <section class="hero">
-      <div class="hero-content">
-        <span class="hero-label">WELCOME TO GAME PARK</span>
-        <h1>遊びの世界へ、<br>飛び込もう。</h1>
-        <p>お気に入りのゲームを見つけて、今すぐプレイ！</p>
-        <a href="#allGames" class="hero-button">ゲームを探す <span>→</span></a>
-      </div>
-      <div class="hero-art" aria-hidden="true">🎮</div>
-      <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
-    </section>
-
-    <section class="section" id="favoritesSection">
-      <div class="section-heading"><div><span class="section-label">YOUR FAVORITES</span><h2>❤️ お気に入り</h2></div></div>
-      <div id="favoriteGames" class="game-grid"></div>
-      <p id="noFavorites" class="subtle-note">ハートを押すと、お気に入りに保存できます。</p>
-    </section>
-
-    <section class="section">
-      <div class="section-heading"><div><span class="section-label">TRENDING NOW</span><h2>🔥 人気のゲーム</h2></div></div>
-      <div id="popularGames" class="game-grid"></div>
-    </section>
-
-    <section class="section" id="allGames">
-      <div class="section-heading">
-        <div><span class="section-label">EXPLORE GAMES</span><h2>🎮 すべてのゲーム</h2></div>
-        <span id="gameCount" class="game-count">100 GAMES</span>
-      </div>
-      <div id="gameGrid" class="game-grid"></div>
-      <p id="emptyMessage" class="empty-message" hidden>ゲームが見つかりませんでした。</p>
-    </section>
-  </main>
-
-  <div class="game-modal" id="gameModal" hidden>
-    <div class="game-window" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
-      <div class="game-toolbar">
-        <div><span class="playing-label">NOW PLAYING</span><h2 id="gameTitle">GAME</h2></div>
-        <div class="game-controls">
-          <button id="fullscreenButton" type="button">⛶ 全画面</button>
-          <button id="closeGame" type="button">✕ 閉じる</button>
-        </div>
-      </div>
-      <div class="game-frame-container"><iframe id="gameFrame" title="ゲーム画面" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe></div>
+<header class="header">
+  <a href="#" class="logo" aria-label="GAME PARK ホーム"><span class="logo-icon">G</span><span>GAME<span class="logo-accent">PARK</span></span></a>
+  <label class="search-box"><span class="search-icon">⌕</span><input id="searchInput" type="search" placeholder="ゲーム名・ジャンルで検索..." aria-label="ゲームを検索"><kbd>⌕</kbd></label>
+  <a class="header-link" href="#allGames">ゲーム一覧 <span>↘</span></a>
+</header>
+<nav class="category-nav" id="categoryNav" aria-label="ゲームカテゴリー">
+  <button class="category active" data-category="all">✦ すべて</button>
+  <button class="category" data-category="action">⚔️ アクション</button>
+  <button class="category" data-category="racing">🏎️ レース</button>
+  <button class="category" data-category="puzzle">🧩 パズル</button>
+  <button class="category" data-category="shooting">🚀 シューティング</button>
+  <button class="category" data-category="adventure">🗺️ 冒険</button>
+  <button class="category" data-category="rpg">🏰 RPG</button>
+  <button class="category" data-category="sports">⚽ スポーツ</button>
+  <button class="category" data-category="horror">👻 ホラー</button>
+  <button class="category" data-category="simulation">🏗️ シミュレーション</button>
+  <button class="category" data-category="casual">🎲 カジュアル</button>
+</nav>
+<main class="main-content">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="live-dot"></span> YOUR NEXT PLAYGROUND</div>
+      <h1>退屈なんて、<br><span>ロード中。</span></h1>
+      <p>気分にぴったりのゲームを見つけよう。<br>インストール不要、クリックですぐプレイ。</p>
+      <div class="hero-actions"><a href="#allGames" class="hero-button">ゲームを探す <span>↗</span></a><button class="hero-random" id="randomGame">🎲 おまかせで遊ぶ</button></div>
+      <div class="hero-stats"><div><strong>100</strong><span>GAME TITLES</span></div><i></i><div><strong>10</strong><span>CATEGORIES</span></div><i></i><div><strong>FREE</strong><span>ALWAYS</span></div></div>
     </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-glow"></div><div class="hero-ring ring-a"></div><div class="hero-ring ring-b"></div>
+      <div class="float-card float-one">🕹️<small>LET'S PLAY</small></div><div class="float-card float-two">🏆<small>NEW RECORD</small></div>
+      <div class="console"><div class="console-screen"><span>G</span><b>GAME<br>PARK</b><i>PRESS START</i></div><div class="console-pad"><span class="cross">✣</span><span class="buttons">●<br>●</span></div></div>
+      <span class="spark spark-a">✦</span><span class="spark spark-b">✧</span><span class="spark spark-c">✦</span>
+    </div>
+  </section>
+  <section class="section" id="favoritesSection">
+    <div class="section-heading"><div><span class="section-label">SAVED FOR LATER</span><h2>♡ お気に入り</h2><p>また遊びたいゲームを集めよう。</p></div></div>
+    <div id="favoriteGames" class="game-grid"></div><p id="noFavorites" class="subtle-note">気になるゲームの ♡ を押すと、ここに保存されます。</p>
+  </section>
+  <section class="section trending-section">
+    <div class="section-heading"><div><span class="section-label">PICKED FOR YOU</span><h2>🔥 人気のゲーム</h2><p>まずはここから遊んでみよう。</p></div><span class="section-aside">TRENDING <b>↗</b></span></div>
+    <div id="popularGames" class="game-grid"></div>
+  </section>
+  <section class="section" id="allGames">
+    <div class="section-heading all-heading"><div><span class="section-label">THE FULL COLLECTION</span><h2>🎮 すべてのゲーム</h2><p>ジャンルを選んで、お気に入りを見つけよう。</p></div><span id="gameCount" class="game-count">100 / 100 GAMES</span></div>
+    <div class="collection-bar"><span>EXPLORE <b>ALL GAMES</b></span><span class="collection-tip">カードをクリックしてプレイ <span>→</span></span></div>
+    <div id="gameGrid" class="game-grid"></div><p id="emptyMessage" class="empty-message" hidden>見つかりませんでした。別のキーワードで検索してみてください。</p>
+  </section>
+</main>
+<div class="game-modal" id="gameModal" hidden>
+ <div class="game-window" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+  <div class="game-toolbar"><div class="toolbar-brand"><span class="toolbar-mark">G</span><div><span class="playing-label">NOW PLAYING</span><h2 id="gameTitle">GAME</h2></div></div>
+   <div class="game-controls"><button id="fullscreenButton" type="button">⛶ <span>全画面</span></button><button id="closeGame" type="button" class="close-button">✕ <span>閉じる</span></button></div>
   </div>
-
-  <footer class="footer">
-    <a href="#" class="logo footer-logo"><span class="logo-icon">G</span> GAME PARK</a>
-    <p>みんなのゲームパークへようこそ！</p>
-    <p class="footer-small">一部のゲームはオリジナルのミニゲームです。外部作品を掲載する場合は、制作者の利用条件を確認してください。</p>
-    <p class="footer-small">© 2026 GAME PARK</p>
-  </footer>
-</body>
-</html>
+  <div class="game-frame-container"><iframe id="gameFrame" title="ゲーム画面" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe></div>
+  <div class="modal-foot"><span>🎮 HAVE FUN & PLAY FAIR</span><span>ESC キーで閉じる</span></div>
+ </div>
+</div>
+<footer class="footer"><a href="#" class="logo footer-logo"><span class="logo-icon">G</span><span>GAME<span class="logo-accent">PARK</span></span></a><p>いつでも、ここが遊び場。</p><div class="footer-line"></div><p class="footer-small">GAME PARK はブラウザーで遊べるオリジナルミニゲーム集です。外部作品を掲載する場合は、制作者の許諾と利用条件を確認してください。</p><p class="footer-small">© 2026 GAME PARK · MADE FOR PLAY</p></footer>
+</body></html>
