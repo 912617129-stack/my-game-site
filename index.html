@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NINJA RUN — 影に隠された伝説｜第一章 開発ビルド</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050b14;color:#f4f7ff;font-family:system-ui,"Yu Gothic",sans-serif}#app{position:relative;width:100vw;height:100dvh;min-height:420px}canvas{width:100%;height:100%;display:block}
+#hud{position:absolute;inset:0;pointer-events:none;display:none}.top{display:flex;justify-content:space-between;padding:10px;gap:8px}.box{background:#071525e8;border:1px solid #607d9a;border-radius:12px;padding:7px 11px;font-size:12px;box-shadow:0 4px 18px #0008;min-width:132px}.bar{height:9px;background:#48283b;border-radius:9px;overflow:hidden;margin:5px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff5575,#ffd17c);transition:width .15s}.energy{height:5px;background:#20374a;border-radius:8px;overflow:hidden}.energy i{display:block;height:100%;background:linear-gradient(90deg,#53bfff,#a6fff0)}#bossbar{position:absolute;top:67px;left:25%;width:50%;display:none;text-align:center;font-size:12px;text-shadow:0 2px 5px #000}#bossbar .bar{height:11px;border:1px solid #ffb6c8}
+#help{position:absolute;left:10px;bottom:10px;background:#061321e8;border:1px solid #48617c;border-radius:10px;padding:8px 10px;font-size:11px;line-height:1.45;max-width:56vw}#touch{position:absolute;right:10px;bottom:10px;display:none;gap:5px;pointer-events:auto}.touch{width:44px;height:43px;background:#142c45eF;border:1px solid #8ba5c1;border-radius:11px;color:white;font-size:17px;font-weight:800;touch-action:none}
+#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(#020812b9,#020812ed);padding:12px}.panel{width:min(780px,97vw);max-height:94vh;overflow:auto;background:linear-gradient(145deg,#142943f7,#081321f9);border:1px solid #607a98;border-radius:19px;padding:20px;box-shadow:0 22px 80px #000d}h1{margin:0;font-size:clamp(27px,5vw,46px);letter-spacing:.06em;text-shadow:0 3px 20px #6abaff55}.sub{color:#bfd0e4;margin:5px 0 15px}.muted{font-size:13px;color:#a9bed4;line-height:1.65}.gold{color:#ffdc84}.card{background:#091827;border:1px solid #354e69;border-radius:12px;padding:12px;margin:9px 0}.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}button{border:1px solid #6b88a7;border-radius:10px;background:linear-gradient(#2a496b,#142b44);color:#f5f8ff;padding:10px 14px;font-weight:750;cursor:pointer}button:hover{filter:brightness(1.18)}button.primary{background:linear-gradient(#f2c86d,#b7792e);color:#251908;border-color:#ffe3a4}button:disabled{opacity:.32;cursor:not-allowed}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:7px}.stage{font-size:12px;padding:9px 3px}.stage small{display:block;color:#bdd0e5;font-weight:400}#toast{position:absolute;top:18%;left:50%;transform:translateX(-50%);background:#081c2eef;border:1px solid #9beaff;padding:9px 17px;border-radius:11px;opacity:0;transition:.2s;pointer-events:none;font-weight:750;white-space:nowrap}#toast.on{opacity:1}
+@media(max-width:700px){.panel{padding:14px}.box{font-size:10px;padding:6px 8px;min-width:105px}.bar{width:100px}#touch{display:flex}#help{font-size:9px;max-width:46vw}.touch{width:40px;height:40px}}
+</style></head><body><div id="app"><canvas id="game"></canvas>
+<div id="hud"><div class="top"><div class="box"><b id="stage">STAGE 01</b><div class="bar"><i id="hpbar"></i></div><span id="hp">HP 5 / 5</span><div class="energy"><i id="energybar"></i></div><small>忍気</small></div><div class="box" style="text-align:right"><b id="area">竹林の里</b><br><span id="coins">◆ 0</span>　<span id="clock">00:00</span><br><small id="weapon">忍者刀</small></div></div><div id="bossbar"><b id="bossname"></b><div class="bar"><i id="bossfill"></i></div></div><div id="help">移動 ← → / A D　ジャンプ Space<br>攻撃 J　忍術 K　回避 Shift　武器 Q　停止 Esc</div><div id="touch"><button class="touch" data-k="ArrowLeft">←</button><button class="touch" data-k="ArrowRight">→</button><button class="touch" data-k="Space">↑</button><button class="touch" data-k="j">刀</button><button class="touch" data-k="k">術</button></div></div>
+<div id="toast"></div><div id="overlay"></div></div>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s),canvas=$('#game'),g=canvas.getContext('2d');
+let W,H,D;function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);canvas.width=W*D;canvas.height=H*D;g.setTransform(D,0,0,D,0,0)}addEventListener('resize',resize);resize();
+const areas=[
+['竹林の里','#0b2530','#28634e','#9be4a6','九尾の狐'],['古道・石灯籠','#102738','#355c66','#d2e7b0','霧隠れの忍'],['竹影の渓谷','#102a3d','#367d83','#7ce4e4','渓谷の大蛙'],['苔むす神社','#18243b','#59605a','#f3d48b','狛犬・阿'],['雨の竹林','#101d2b','#334b58','#91c8e8','雨月のくノ一'],['黒影の砦','#171a2e','#55404b','#e9a1a5','鬼武'],['竹海の吊り橋','#102a35','#4b7b68','#d7e9a1','鎖鎌の豪傑'],['月見の丘','#10172c','#4b5272','#d6d8ff','月影の梟'],['封印の洞窟','#111a2a','#354c63','#7ce7ff','岩窟の鬼'],['狐火の社','#170f25','#65324b','#ffb3d1','九尾の狐']];
+const lengths=[2500,2700,2850,2950,3050,3150,3250,3350,3450,3650];
+const save0={unlocked:1,cleared:[],coins:0,skin:0,weapon:0,upgrade:0,seen:false,best:{},scrolls:['火龍'],personality:'',sound:true};
+let S={...save0};try{S={...S,...JSON.parse(localStorage.getItem('ninjaRunCh1Complete')||'{}')}}catch{}
+const skins=['#202b3e','#b83e4b','#397fc2','#e9e5db','#8654ba','#31885e','#c89b35','#9daec0','#d779a9','#4fc7bb'];
+const weapons=[['忍者刀',68,1],['苦無',190,1],['鎖鎌',112,2]];
+let mode='menu',keys={},P,E,plats,items,fx,shots,B,level,cam,frame,elapsed,last,toastT,checkpoint=0,combo=0,comboTimer=0,audio=null;
+function save(){try{localStorage.setItem('ninjaRunCh1Complete',JSON.stringify(S))}catch{}}
+function sound(freq=440,dur=.08,type='sine',vol=.035){if(!S.sound)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),v=audio.createGain();o.type=type;o.frequency.value=freq;v.gain.value=vol;o.connect(v);v.connect(audio.destination);o.start();v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.stop(audio.currentTime+dur)}catch{}}
+function toast(t){$('#toast').textContent=t;$('#toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('#toast').classList.remove('on'),1450)}
+function panel(t,s,b){$('#hud').style.display='none';$('#bossbar').style.display='none';$('#overlay').style.display='flex';$('#overlay').innerHTML=`<div class="panel"><h1>${t}</h1><div class="sub">${s}</div>${b}</div>`}
+function menu(){mode='menu';panel('NINJA RUN','— 影に隠された伝説 —',`<div class="card"><b class="gold">第一章　竹林の里</b><p>五つの忍魂が奪われ、里に黒い霧が広がった。師匠・白雲と凛の導きで、若き忍びは守り神・九尾の狐を救う旅に出る。</p><p class="muted">クリア ${S.cleared.length}/10　最高解放 ${S.unlocked}/10　◆ ${S.coins}</p></div><div class="row"><button class="primary" id="go">冒険を続ける</button><button id="select">ステージ選択</button><button id="equip">装備・記録</button><button id="sound">音 ${S.sound?'ON':'OFF'}</button></div><p class="muted">←→/A,D移動　Spaceジャンプ　J攻撃　K忍術　Shift回避　Q武器変更</p>`);$('#go').onclick=()=>S.seen?start(Math.min(10,S.unlocked)):intro();$('#select').onclick=selectMenu;$('#equip').onclick=equipMenu;$('#sound').onclick=()=>{S.sound=!S.sound;save();menu()}}
+function intro(){S.seen=true;save();panel('序章　黒い霧','竹林の里・夜明け',`<div class="card"><b>白雲</b><p>「五つの忍魂が奪われた。竹林の守り神まで黒い霧に侵されている。」</p><b>凛</b><p>「最初の任務は狐の里。気をつけて行ってきて！」</p><p>「どんな忍びになりたい？」</p></div><div class="row"><button data-p="熱血">仲間を守る熱血の忍び</button><button data-p="冷静">真実を見極める冷静な忍び</button><button data-p="自由">自由で楽しい忍び</button></div>`);document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.personality=b.dataset.p;save();start(1)})}
+function selectMenu(){let h='<p class="muted">第一章・竹林の里。ステージ10で九尾の狐と決戦。</p><div class="grid">';for(let i=1;i<=10;i++)h+=`<button class="stage" data-n="${i}" ${i<=S.unlocked?'':'disabled'}>STAGE ${String(i).padStart(2,'0')}<small>${areas[i-1][0]}${i===10?'・BOSS':''}</small></button>`;h+='</div><div class="row"><button id="back">戻る</button></div>';panel('ステージ選択','第一章 1〜10',h);document.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>start(+b.dataset.n));$('#back').onclick=menu}
+function equipMenu(){panel('装備・記録','プレイデータはこのブラウザに自動保存',`<div class="card">クリア：${S.cleared.length}/10<br>コイン：${S.coins}<br>装束カラー：${S.skin+1}/10<br>武器：${weapons[S.weapon][0]}<br>刀強化：${S.upgrade}/5<br>忍術：${S.scrolls.join('・')}</div><div class="row"><button id="skin">装束カラー変更</button><button id="wp">武器変更</button><button id="up">刀を強化（◆50）</button><button id="reset">セーブ初期化</button><button id="back">戻る</button></div>`);$('#skin').onclick=()=>{S.skin=(S.skin+1)%10;save();equipMenu()};$('#wp').onclick=()=>{S.weapon=(S.weapon+1)%3;save();equipMenu()};$('#up').onclick=()=>{if(S.coins>=50&&S.upgrade<5){S.coins-=50;S.upgrade++;save();equipMenu()}else toast('コイン不足または最大強化')};$('#back').onclick=menu;$('#reset').onclick=()=>{if(confirm('初期化しますか？')){localStorage.removeItem('ninjaRunCh1Complete');location.reload()}}}
+function floor(){return H-82}
+function start(n){mode='play';level=n;cam=0;frame=0;elapsed=0;last=performance.now();checkpoint=0;P={x:70,y:floor()-46,vx:0,vy:0,w:30,h:46,face:1,ground:false,atk:0,inv:0,dash:0,energy:100,hp:5,anim:0,scroll:0};let len=lengths[n-1];plats=[];for(let i=0;i<7;i++){let x=300+i*(len-560)/7;plats.push({x,y:floor()-100-(i%3)*36,w:112+(i%2)*40})}E=[];for(let i=0;i<6+n%3;i++){let x=390+i*(len-520)/(6+n%3),type=i%4===0?'brute':i%3===0?'archer':'scout';E.push({x,y:floor()-42,w:type==='brute'?40:30,h:42,hp:type==='brute'?3:2,type,dir:i%2?1:-1,hit:0,shot:0,dead:false})}items=[];for(let i=0;i<10;i++)items.push({x:250+i*(len-450)/10,y:floor()-68-(i%3)*36,type:i%4===0?'scroll':'coin',taken:false});fx=[];shots=[];B=n===10?{x:len-225,y:floor()-145,w:120,h:145,hp:90,max:90,hit:0,attack:0,phase:1,dead:false}:null;$('#overlay').style.display='none';$('#hud').style.display='block';$('#bossbar').style.display=B?'block':'none';hud();requestAnimationFrame(loop)}
+function hud(){$('#stage').textContent='STAGE '+String(level).padStart(2,'0');$('#area').textContent=areas[level-1][0];$('#hpbar').style.width=P.hp/5*100+'%';$('#hp').textContent=`HP ${P.hp}/5`;$('#energybar').style.width=P.energy+'%';$('#coins').textContent='◆ '+S.coins;$('#weapon').textContent=weapons[S.weapon][0]}
+function damage(){if(P.inv>0||mode!=='play')return;P.hp--;P.inv=72;sound(110,.18,'sawtooth',.05);hud();if(P.hp<=0){mode='dead';setTimeout(()=>{panel('任務失敗','もう一度挑戦しよう',`<div class="row"><button class="primary" id="retry">再挑戦</button><button id="home">メニュー</button></div>`);$('#retry').onclick=()=>start(level);$('#home').onclick=menu},180)}}
+function kill(e){e.dead=true;S.coins+=5;combo++;comboTimer=150;for(let i=0;i<14;i++)fx.push({x:e.x,y:e.y+12,vx:(Math.random()-.5)*5,vy:-Math.random()*4,life:28,color:'#ffe18a'});sound(250+combo*25,.06,'triangle');save();hud()}
+function attack(){P.atk=13;sound(220,.07,'sawtooth');let w=weapons[S.weapon];for(let e of E)if(!e.dead&&Math.abs(e.x-P.x-P.face*38)<w[1]&&Math.abs(e.y-P.y)<68&&e.hit<=0){e.hp-=w[2]+S.upgrade*.35;e.hit=22;if(e.hp<=0)kill(e)}if(B&&Math.abs(B.x-P.x-P.face*60)<145&&B.hit<=0){B.hp-=2+S.upgrade*.45;B.hit=16;sound(120,.1,'square');if(B.hp<=0)B.dead=true}}
+function ninjutsu(){if(P.energy<35)return;P.energy-=35;sound(90,.35,'sawtooth',.06);for(let e of E)if(!e.dead&&Math.abs(e.x-P.x)<420){e.hp-=4;if(e.hp<=0)kill(e)}if(B){B.hp-=10;B.hit=18;if(B.hp<=0)B.dead=true}for(let i=0;i<45;i++)fx.push({x:P.x,y:P.y+20,vx:(Math.random()-.5)*10,vy:(Math.random()-.5)*9,life:38,color:'#ff874b'});toast('火龍の術！')}
+function action(k){if(mode!=='play')return;if(k==='j')attack();if(k==='k')ninjutsu();if(k==='q'){S.weapon=(S.weapon+1)%3;save();hud();toast('武器：'+weapons[S.weapon][0])}if(k==='Space'&&P.ground){P.vy=-12.3;P.ground=false;sound(360,.05)}if(k==='Shift'&&P.energy>12){P.energy-=12;P.dash=12;P.inv=17;P.vx=P.face*10;sound(520,.05)}}
+function kd(e){let k=e.code==='Space'?'Space':e.key.length===1?e.key.toLowerCase():e.key;
+if(k==='Escape' && mode==='play'){mode='pause';panel('一時停止','冒険はここで待機中',`<div class="row"><button class="primary" id="resume">冒険に戻る</button><button id="quit">メニューへ</button></div>`);$('#resume').onclick=()=>{mode='play';$('#overlay').style.display='none';$('#hud').style.display='block';last=performance.now();requestAnimationFrame(loop)};$('#quit').onclick=menu;return;}if(['ArrowLeft','ArrowRight','Space'].includes(k))e.preventDefault();keys[k]=true;if(!e.repeat)action(k)}function ku(e){let k=e.code==='Space'?'Space':e.key.length===1?e.key.toLowerCase():e.key;keys[k]=false}addEventListener('keydown',kd);addEventListener('keyup',ku);
+document.querySelectorAll('.touch').forEach(b=>{let k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();keys[k]=true;action(k)};['pointerup','pointerleave','pointercancel'].forEach(v=>b.addEventListener(v,()=>keys[k]=false))});
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function finish(){if(mode!=='play')return;mode='clear';let sec=Math.floor(elapsed/60),rank=sec<75?'S':sec<110?'A':sec<150?'B':'C',reward=40+(rank==='S'?40:rank==='A'?20:0);S.coins+=reward;if(!S.cleared.includes(level))S.cleared.push(level);S.unlocked=Math.max(S.unlocked,Math.min(10,level+1));S.best[level]=Math.min(S.best[level]||99999,sec);save();panel(level===10?'第一章クリア！':'STAGE CLEAR！',`評価 RANK ${rank}`,`<div class="card"><b class="gold">RANK ${rank}</b><p>タイム ${fmt(sec)}<br>獲得コイン ◆${reward}<br>${level===10?'九尾の狐を黒い霧から救い出した。第一章完結！':'次のステージが解放された。'}</p></div><div class="row"><button class="primary" id="next">${level===10?'第一章を再プレイ':'次のステージへ'}</button><button id="map">ステージ選択</button><button id="home">メニュー</button></div>`);$('#next').onclick=()=>start(level===10?1:level+1);$('#map').onclick=selectMenu;$('#home').onclick=menu}
+function loop(now){if(mode!=='play')return;let dt=Math.min(2,(now-last)/16.67||1);last=now;frame++;elapsed+=dt;let dir=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0);if(P.dash>0)P.dash-=dt;else P.vx+=(dir*4.2-P.vx)*Math.min(1,.3*dt);if(dir)P.face=dir;P.x=Math.max(0,Math.min(lengths[level-1]-55,P.x+P.vx*dt));P.vy+=.58*dt;P.y+=P.vy*dt;P.ground=false;if(P.y+P.h>=floor()){P.y=floor()-P.h;P.vy=0;P.ground=true}for(let p of plats){if(P.vy>=0&&P.x+P.w>p.x&&P.x<p.x+p.w&&P.y+P.h>=p.y&&P.y+P.h<=p.y+20&&P.y+P.h-P.vy*dt<=p.y+7){P.y=p.y-P.h;P.vy=0;P.ground=true}}P.atk=Math.max(0,P.atk-dt);P.inv=Math.max(0,P.inv-dt);P.energy=Math.min(100,P.energy+.13*dt);P.anim+=dt;cam=Math.max(0,Math.min(lengths[level-1]-W,P.x-W*.34));if(comboTimer>0)comboTimer-=dt;else combo=0;
+for(let e of E){if(e.dead)continue;e.x+=e.dir*(e.type==='brute'?1:1.5)*dt;if(Math.abs(e.x-P.x)<260)e.dir=P.x>e.x?1:-1;if(e.hit>0)e.hit-=dt;if(Math.abs(e.x-P.x)<35&&Math.abs(e.y-P.y)<58)damage();if(e.type==='archer'&&Math.abs(e.x-P.x)<330&&(e.shot+=dt)>95){e.shot=0;shots.push({x:e.x,y:e.y+12,vx:P.x<e.x?-3.1:3.1,life:140})}}
+if(B){B.phase=B.hp<B.max*.5?2:1;B.x+=B.x>P.x?-.62*dt:.62*dt;if(B.hit>0)B.hit-=dt;B.attack+=dt;if(B.attack>(B.phase===1?90:62)){B.attack=0;for(let i=0;i<(B.phase===1?3:5);i++)shots.push({x:B.x,y:B.y+55+i*10,vx:(P.x<B.x?-1:1)*(3+i*.35),life:150})}if(Math.abs(B.x-P.x)<88)damage();if(B.dead){B=null;$('#bossbar').style.display='none';toast('九尾の狐を救い出した！')}}
+for(let q of shots){q.x+=q.vx*dt;q.life-=dt;if(Math.abs(q.x-P.x)<18&&Math.abs(q.y-P.y-20)<38){q.life=0;damage()}}shots=shots.filter(q=>q.life>0);
+for(let it of items)if(!it.taken&&Math.abs(it.x-P.x)<25&&Math.abs(it.y-P.y-20)<55){it.taken=true;if(it.type==='coin'){S.coins+=10;toast('コイン +10')}else{P.energy=100;S.scrolls=['火龍','雷'];toast('巻物入手！ 忍気全回復')}save();hud()}
+for(let f of fx){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=.1*dt;f.life-=dt}fx=fx.filter(f=>f.life>0);
+if(B){$('#bossbar').style.display='block';$('#bossname').textContent='九尾の狐'+(B.phase===2?'・怒り':'');$('#bossfill').style.width=(B.hp/B.max*100)+'%'}if(P.x>lengths[level-1]-75&&!B)finish();if(frame%60===0)$('#clock').textContent=fmt(Math.floor(elapsed/60));draw();requestAnimationFrame(loop)}
+function draw(){let a=areas[level-1],gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,a[1]);gr.addColorStop(1,a[2]);g.fillStyle=gr;g.fillRect(0,0,W,H);g.fillStyle=level>=8?'#e5e6ff':'#ffe5a5';g.globalAlpha=.72;g.beginPath();g.arc(W*.8,82,27,0,7);g.fill();g.globalAlpha=1;
+for(let l=0;l<4;l++){g.fillStyle=['#102d3aaa','#19483faa','#285c4aaa','#173b35'][l];for(let i=-2;i<W/110+3;i++){let x=((i*130-cam*(.08+l*.12))%(W+160))-70,h=85+(i*37+level*19)%110;g.beginPath();g.moveTo(x,floor());g.lineTo(x+65,floor()-h);g.lineTo(x+130,floor());g.fill()}}
+// Distant torii silhouettes and drifting fireflies
+if(level===1 || level===10){
+  for(let t=0;t<2;t++){let tx=((W*.62+t*420-cam*.16)%(W+300))-100;
+    g.fillStyle='#172b2b';g.fillRect(tx, floor()-175, 12,175);
+    g.fillRect(tx+90,floor()-175,12,175);g.fillRect(tx-12,floor()-180,126,12);
+    g.fillRect(tx-5,floor()-194,112,8);
+  }
+}
+for(let i=0;i<25;i++){let x=((i*173-cam*.5)%(W+100))-30,y=100+(i*79%Math.max(180,H-220));g.fillStyle=i%3===0?a[3]:'#b2d8a0';g.globalAlpha=.2+Math.sin(frame*.04+i)*.12;g.beginPath();g.arc(x,y,1.5+i%3,0,7);g.fill()}g.globalAlpha=1;
+// Foreground ground with layered terrain
+g.fillStyle='#10231f';g.fillRect(0,floor(),W,H-floor());
+g.fillStyle='#294b3b';g.fillRect(0,floor(),W,7);
+g.fillStyle='#45694c';g.globalAlpha=.65;
+for(let gx=-(cam%42);gx<W;gx+=42){g.beginPath();g.moveTo(gx,floor()+8);g.lineTo(gx+12,floor()-3);g.lineTo(gx+18,floor()+8);g.fill();}
+g.globalAlpha=1;
+for(let x=-(cam%65);x<W;x+=65){g.fillStyle=a[3];g.globalAlpha=.25;g.fillRect(x,floor()+5,30,2);g.globalAlpha=1}
+for(let p of plats){let x=p.x-cam;g.fillStyle='#263f37';g.fillRect(x,p.y,p.w,17);g.fillStyle=a[3];g.fillRect(x,p.y,p.w,4);g.fillStyle='#587c58';for(let j=12;j<p.w;j+=25){g.beginPath();g.arc(x+j,p.y,3,Math.PI,0);g.fill()}}
+for(let it of items)if(!it.taken){g.fillStyle=it.type==='coin'?'#ffdb70':'#a1eeff';g.shadowBlur=13;g.shadowColor=g.fillStyle;g.beginPath();g.arc(it.x-cam,it.y,7+Math.sin(frame*.1)*1.2,0,7);g.fill();g.shadowBlur=0}
+for(let e of E)if(!e.dead){
+  const ex=e.x-cam, bob=Math.sin(frame*.12+e.x)*2;
+  g.save();g.translate(ex+e.w/2,e.y+bob);
+  g.fillStyle='#071019';g.globalAlpha=.35;g.beginPath();g.ellipse(0,e.h+2,e.w*.7,5,0,0,Math.PI*2);g.fill();g.globalAlpha=1;
+  const body=e.hit>0?'#fff':e.type==='brute'?'#9b514b':e.type==='archer'?'#4f8794':'#655d91';
+  g.fillStyle=body;g.beginPath();g.moveTo(-e.w*.42,9);g.lineTo(e.w*.42,9);g.lineTo(e.w*.55,e.h-4);g.lineTo(-e.w*.55,e.h-4);g.closePath();g.fill();
+  g.fillStyle='#18202d';g.beginPath();g.arc(0,5,e.type==='brute'?13:11,0,Math.PI*2);g.fill();
+  g.fillStyle='#c9d7df';g.fillRect(-9,2,18,4);g.fillStyle='#ffdf9c';g.fillRect(3,3,4,2);
+  g.fillStyle=body;g.beginPath();g.moveTo(-12,-1);g.lineTo(0,-13);g.lineTo(13,-1);g.fill();
+  g.strokeStyle=e.type==='archer'?'#d4c18d':'#b9c8d4';g.lineWidth=3;g.beginPath();
+  if(e.type==='archer'){g.arc(17,17,13,-1.2,1.2);g.moveTo(17,4);g.lineTo(17,30);}
+  else {g.moveTo(-8,25);g.lineTo(-14,39);g.moveTo(8,25);g.lineTo(14,39);}
+  g.stroke();g.restore();
+}
+if(B){g.fillStyle=B.hit>0?'white':'#eee5f2';g.beginPath();g.ellipse(B.x-cam,B.y+80,58,66,0,0,7);g.fill();for(let i=0;i<9;i++){let an=i/9*Math.PI*2;g.beginPath();g.ellipse(B.x-cam+Math.cos(an)*58,B.y+80+Math.sin(an)*45,17,35,an,0,7);g.fill()}g.beginPath();g.arc(B.x-cam,B.y+24,37,0,7);g.fill();g.fillStyle='#bd3155';g.fillRect(B.x-cam-22,B.y+17,10,5);g.fillRect(B.x-cam+12,B.y+17,10,5)}
+for(let q of shots){g.fillStyle='#ff8e9b';g.beginPath();g.arc(q.x-cam,q.y,5,0,7);g.fill()}
+if(!(P.inv>0&&Math.floor(frame/4)%2===0)){
+ let x=P.x-cam,y=P.y, run=Math.sin(P.anim*.32), crouch=P.dash>0?7:0;
+ g.save();g.translate(x+15,y+23);if(P.face<0)g.scale(-1,1);
+ // shadow and trailing scarf
+ g.fillStyle='#02070b';g.globalAlpha=.4;g.beginPath();g.ellipse(0,26,18,5,0,0,7);g.fill();g.globalAlpha=1;
+ g.fillStyle=skins[S.skin];g.beginPath();g.moveTo(-7,-5);g.lineTo(-17,-11+run*3);g.lineTo(-27,-5+run*5);g.lineTo(-13,3);g.fill();
+ // legs with running cycle
+ g.strokeStyle='#111d2a';g.lineWidth=7;g.lineCap='round';g.beginPath();
+ g.moveTo(-5,13-crouch);g.lineTo(-10+run*6,25);g.moveTo(5,13-crouch);g.lineTo(10-run*6,25);g.stroke();
+ g.strokeStyle=skins[S.skin];g.lineWidth=5;g.beginPath();g.moveTo(-10+run*6,25);g.lineTo(-16+run*6,25);g.moveTo(10-run*6,25);g.lineTo(16-run*6,25);g.stroke();
+ // torso, belt and shoulder guards
+ g.fillStyle=skins[S.skin];g.beginPath();g.moveTo(-11,-7);g.lineTo(11,-7);g.lineTo(9,15-crouch);g.lineTo(-9,15-crouch);g.closePath();g.fill();
+ g.fillStyle='#d6b56c';g.fillRect(-10,7-crouch,20,3);g.fillRect(3,1,5,5);
+ // arms
+ g.strokeStyle=skins[S.skin];g.lineWidth=6;g.beginPath();g.moveTo(-8,-3);g.lineTo(-14,8+run*2);g.moveTo(8,-3);g.lineTo(13,5);g.stroke();
+ // head, mask, headband and knot
+ g.fillStyle='#e8d7c4';g.beginPath();g.arc(0,-15,10,0,7);g.fill();
+ g.fillStyle=skins[S.skin];g.beginPath();g.moveTo(-12,-19);g.lineTo(-9,-29);g.lineTo(9,-29);g.lineTo(13,-18);g.fill();
+ g.fillStyle='#172334';g.fillRect(-10,-15,20,6);g.fillStyle='#fff2c9';g.fillRect(3,-13,4,2);
+ g.fillStyle='#e0bd73';g.fillRect(-11,-22,22,3);
+ // sword and slash arc
+ g.strokeStyle='#dcecff';g.lineWidth=3;g.beginPath();g.moveTo(10,-2);g.lineTo(24,P.atk>0?-24:-11);g.stroke();
+ g.strokeStyle='#8199b5';g.lineWidth=1;g.beginPath();g.moveTo(10,-2);g.lineTo(24,P.atk>0?-24:-11);g.stroke();
+ if(P.atk>0){g.strokeStyle='#a9efff';g.lineWidth=4;g.shadowBlur=14;g.shadowColor='#7deaff';g.beginPath();g.arc(10,-4,34,-.95,.8);g.stroke();g.shadowBlur=0;}
+ g.restore();
+}
+for(let f of fx){g.globalAlpha=Math.max(0,f.life/35);g.fillStyle=f.color;g.beginPath();g.arc(f.x-cam,f.y,3+Math.random()*2,0,7);g.fill();g.globalAlpha=1}if(combo>1){g.fillStyle='#ffdf87';g.font='bold 19px sans-serif';g.fillText(combo+' HIT!',W*.48,140)}g.fillStyle='white';g.font='12px sans-serif';g.fillText('GO →',W-52,H-100)}
+menu();
+})();
+</script></body></html>
